@@ -1,20 +1,16 @@
 package de.daver.backup.program;
 
-public class SwitcherProgram extends SimpleProgram {
+import de.daver.backup.util.ConsoleInput;
 
-    private final ProgramManager manager;
-
-    public SwitcherProgram(ProgramManager manager) {
-        super("switcher");
-        this.manager = manager;
-    }
+public record SwitcherProgram(ProgramManager manager) implements Action {
 
     @Override
-    public void run() {
-        switch (readLn("Please choose your program (0 = exit, 1 = fast, 2 = parent mode)", Integer::parseInt)) {
+    public boolean run() {
+        switch (ConsoleInput.readInput("Please choose your program (0 = exit, 1 = fast, 2 = parent mode)", Integer::parseInt)) {
             case 0 -> manager.deactivate();
             case 1 -> manager.switchTo("fastCopy");
             case 2 -> manager.switchTo("parent");
         }
+        return true;
     }
 }

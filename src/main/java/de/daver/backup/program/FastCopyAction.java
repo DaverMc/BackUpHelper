@@ -2,6 +2,7 @@ package de.daver.backup.program;
 
 import de.daver.backup.CopyFileVisitor;
 import de.daver.backup.LoggingHelper;
+import de.daver.backup.util.ConsoleInput;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,21 +11,17 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FastCopyProgram extends SimpleProgram {
-
-    public FastCopyProgram() {
-        super("fastCopy");
-    }
+public record FastCopyAction() implements Action {
 
     @Override
-    public void run() {
-        var source = readLn("Source directory to search from: ", Path::of);
-        var destination = readLn("Destination directory to copy to: ", Path::of);
-        var suffixes = readLn("Suffixes to copy example (png,docx,xlsx,...): ",
+    public boolean run() {
+        var source = ConsoleInput.readInput("Source directory to search from: ", Path::of);
+        var destination = ConsoleInput.readInput("Destination directory to copy to: ", Path::of);
+        var suffixes = ConsoleInput.readInput("Suffixes to copy example (png,docx,xlsx,...): ",
                 s -> new HashSet<>(Arrays.asList(s.split(","))));
 
         copyFiles(source, destination, suffixes);
-        stop();
+        return false;
     }
 
     void copyFiles(Path sourceRoot, Path destinationRoot, Set<String> fileSuffixes) {
