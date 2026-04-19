@@ -1,30 +1,22 @@
-import de.daver.backup.CopyFileVisitor;
 import de.daver.backup.LoggingHelper;
+import de.daver.backup.program.FastCopyProgram;
+import de.daver.backup.program.ParentModeProgram;
+import de.daver.backup.program.ProgramManager;
+import de.daver.backup.program.SwitcherProgram;
 
 void main() {
     final String VERSION = "1.0";
 
     LoggingHelper.info("Welcome to BackUp-Helper v.%s", VERSION);
 
-    var source = readLn("Source directory to search from: ", Path::of);
-    var destination = readLn("Destination directory to copy to: ", Path::of);
-    var suffixes = readLn("Suffixes to copy example (png,docx,xlsx,...): ",
-            s -> new HashSet<>(Arrays.asList(s.split(","))));
+    var programManager = new ProgramManager();
 
-    copyFiles(source, destination, suffixes);
-}
+    programManager.register(new SwitcherProgram(programManager));
+    programManager.register(new FastCopyProgram());
+    programManager.register(new ParentModeProgram());
 
+    while(programManager.run()) {}
 
-<T> T readLn(String prompt, Function<String, T> deserializer) {
-    return deserializer.apply(IO.readln(prompt));
-}
-
-
-void copyFiles(Path sourceRoot, Path destinationRoot, Set<String> fileSuffixes) {
-    try {
-        Files.walkFileTree(sourceRoot, new CopyFileVisitor(destinationRoot, fileSuffixes));
-    } catch (IOException e) {
-        LoggingHelper.error(e);
-    }
+    LoggingHelper.info("Shutting down BackUp-Helper, See you :)");
 }
 

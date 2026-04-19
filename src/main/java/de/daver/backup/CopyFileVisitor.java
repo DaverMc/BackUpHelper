@@ -21,15 +21,17 @@ public class CopyFileVisitor extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         LoggingHelper.debug("Processing %s", file.toString());
-        for (var suffix : suffixes) {
-            LoggingHelper.debug("Checking suffix \"%s\" for file: %s", suffix, file.toString());
-            if (file.toString().endsWith("." + suffix)) {
-                var destination = rootDestination.resolve(file.getFileName());
-                Files.copy(file, destination);
-                LoggingHelper.info("Copied file %s to %s", file.toString(), destination.toString());
-                break;
-            }
-        }
+        var fileExtension = getFileExtension(file);
+        if(!suffixes.contains(fileExtension)) return FileVisitResult.CONTINUE;
+        var destination = rootDestination.resolve(file.getFileName());
+        Files.copy(file, destination);
+        LoggingHelper.info("Copied file %s to %s", file.toString(), destination.toString());
         return FileVisitResult.CONTINUE;
+    }
+
+    private String getFileExtension(Path file) {
+        var fileName = file.getFileName().toString();
+        int dotIndex = fileName.lastIndexOf('.');
+        return dotIndex == -1 ? "" : fileName.substring(dotIndex + 1).toLowerCase();
     }
 }
