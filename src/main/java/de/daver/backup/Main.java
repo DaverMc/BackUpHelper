@@ -10,13 +10,16 @@ void main() {
     LoggingHelper.info("Welcome to BackUp-Helper v.%s", VERSION);
 
     var programManager = new ProgramManager();
-
-    programManager.register(new SwitcherProgram(programManager));
-    programManager.register(new FastCopyProgram());
-    programManager.register(new ParentModeProgram());
+    registerPrograms(programManager);
 
     while(programManager.run()) {}
 
     LoggingHelper.info("Shutting down BackUp-Helper, See you :)");
+}
+
+void registerPrograms(ProgramManager pm) {
+    pm.register(new SwitcherProgram(pm));
+    pm.register(new FastCopyProgram());
+    pm.register(new ParentModeProgram());
 }
 

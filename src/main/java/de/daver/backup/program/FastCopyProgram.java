@@ -24,6 +24,7 @@ public class FastCopyProgram extends SimpleProgram {
                 s -> new HashSet<>(Arrays.asList(s.split(","))));
 
         copyFiles(source, destination, suffixes);
+        stop();
     }
 
     void copyFiles(Path sourceRoot, Path destinationRoot, Set<String> fileSuffixes) {

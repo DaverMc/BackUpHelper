@@ -11,7 +11,8 @@ public class SwitcherProgram extends SimpleProgram {
 
     @Override
     public void run() {
-        switch (readLn("Please choose your program (1 = fast, 2 = parent mode)", Integer::parseInt)) {
+        switch (readLn("Please choose your program (0 = exit, 1 = fast, 2 = parent mode)", Integer::parseInt)) {
+            case 0 -> manager.deactivate();
             case 1 -> manager.switchTo("fastCopy");
             case 2 -> manager.switchTo("parent");
         }
