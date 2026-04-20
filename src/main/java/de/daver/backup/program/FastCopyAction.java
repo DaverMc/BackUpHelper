@@ -1,34 +1,48 @@
 package de.daver.backup.program;
 
-import de.daver.backup.CopyFileVisitor;
-import de.daver.backup.LoggingHelper;
-import de.daver.backup.util.ConsoleInput;
+import de.daver.backup.io.DestinationCreator;
+import de.daver.backup.io.FileHelper;
+import de.daver.backup.util.Console;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-public record FastCopyAction() implements Action {
+public record FastCopyAction(DestinationCreator creator) implements Action {
+
+    public static Action plain() {
+        return new FastCopyAction((_, sourceFile, rootDestination) -> rootDestination
+                .resolve(sourceFile.getFileName()));
+    }
+
+    public static Action parentDir() {
+        return new FastCopyAction((sourceRoot, sourceFile, rootDestination) -> {
+            var relativized = sourceRoot.relativize(sourceFile);
+            var parent = relativized.getParent();
+
+            var dirName = (parent == null) ? "root" : parent.toString()
+                    .replace("\\", "_")
+                    .replace("/", "_");
+
+            return rootDestination.resolve(dirName).resolve(sourceFile.getFileName());
+        });
+    }
 
     @Override
     public boolean run() {
-        var source = ConsoleInput.readInput("Source directory to search from: ", Path::of);
-        var destination = ConsoleInput.readInput("Destination directory to copy to: ", Path::of);
-        var suffixes = ConsoleInput.readInput("Suffixes to copy example (png,docx,xlsx,...): ",
-                s -> new HashSet<>(Arrays.asList(s.split(","))));
+        var source = Console.readInput("Source directory to search from: ", Path::of);
+        var destination = Console.readInput("Destination directory to copy to: ", Path::of);
+        var suffixes = Console.readInput("Suffixes to copy example (png,docx,xlsx,...): ",
+                s -> Arrays.stream(s.split(","))
+                        .map(String::trim)
+                        .filter(Predicate.not(String::isBlank))
+                        .collect(Collectors.toSet()));
 
-        copyFiles(source, destination, suffixes);
+        FileHelper.copyFiles(source, destination, suffixes, creator);
         return false;
     }
 
-    void copyFiles(Path sourceRoot, Path destinationRoot, Set<String> fileSuffixes) {
-        try {
-            Files.walkFileTree(sourceRoot, new CopyFileVisitor(destinationRoot, fileSuffixes));
-        } catch (IOException e) {
-            LoggingHelper.error(e);
-        }
-    }
+
 }
