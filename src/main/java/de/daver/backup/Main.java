@@ -1,7 +1,5 @@
 import de.daver.backup.LoggingHelper;
-import de.daver.backup.program.FastCopyAction;
-import de.daver.backup.program.ProgramManager;
-import de.daver.backup.program.SwitcherProgram;
+import de.daver.backup.program.*;
 
 void main() {
     final String VERSION = "1.0";
@@ -16,11 +14,11 @@ void main() {
 }
 
 ProgramManager registerPrograms() {
-    var pm = new ProgramManager("switcher");
-    pm.register("switcher", new SwitcherProgram(pm));
+    var pm = new ProgramManager();
 
-    pm.register("fastCopy", FastCopyAction.plain());
-    pm.register("parent", FastCopyAction.parentDir());
+    pm.register("plain", new FastCopyAction(Destinations.PLAIN));
+    pm.register("flat", new FastCopyAction(Destinations.FLAT_PACKETS));
+    pm.register("config", new ConfigurableCopyAction());
 
     return pm;
 }

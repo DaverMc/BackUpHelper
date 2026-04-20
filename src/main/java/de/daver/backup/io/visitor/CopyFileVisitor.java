@@ -1,7 +1,5 @@
 package de.daver.backup.io.visitor;
 
-import de.daver.backup.LoggingHelper;
-import de.daver.backup.io.DestinationCreator;
 import de.daver.backup.io.FileHelper;
 
 import java.io.IOException;
@@ -11,7 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class CopyFileVisitor extends SimpleFileVisitor<Path> {
 
